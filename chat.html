@@ -73,16 +73,16 @@
                         renderHTML: true
                     },
                     botMessage: {
-                        backgroundColor: '#f7f8ff !important',
-                        textColor: '#303235 !important',
+                        backgroundColor: '#f7f8ff',
+                        textColor: '#303235',
                         showAvatar: true,
-                        avatarSrc: 'https://raw.githubusercontent.com/zahidkhawaja/langchain-chat-nextjs/main/public/parroticon.png !important'
+                        avatarSrc: 'texture/bot.png'
                     },
                     userMessage: {
-                        backgroundColor: '#bccad1 !important',
-                        textColor: '#000000 !important',
+                        backgroundColor: '#bccad1',
+                        textColor: '#ffffff',
                         showAvatar: true,
-                        avatarSrc: 'https://raw.githubusercontent.com/zahidkhawaja/langchain-chat-nextjs/main/public/usericon.png'
+                        avatarSrc: 'texture/user.png'
                     }
                 },
                 customCSS: `
@@ -95,27 +95,12 @@
                         display: none !important;
                     }
                     
-                    /* 用戶訊息樣式強制覆蓋 */
-                    .user-message, 
-                    .user-message-container, 
-                    .user-message-box, 
-                    div[class*="user"] {
-                        background-color: #bccad1 !important;
-                    }
-                    
-                    /* 機器人訊息樣式強制覆蓋 */
-                    .bot-message, 
-                    .bot-message-container, 
-                    .bot-message-box, 
-                    div[class*="bot"] {
-                        background-color: #f7f8ff !important;
-                    }
-                    
-                    /* 強制顯示圖標 */
-                    .user-avatar img, .bot-avatar img {
+                    /* 確保頭像正確顯示 */
+                    .cib-message-avatar img {
+                        width: 28px !important;
+                        height: 28px !important;
+                        object-fit: contain !important;
                         display: block !important;
-                        visibility: visible !important;
-                        opacity: 1 !important;
                     }
                 `
             });
