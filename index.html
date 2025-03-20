@@ -2,373 +2,46 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=no">
     <title>建築技術規則與台中建管資訊</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        body, html {
             margin: 0;
             padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
-            background-color: transparent;
-            background-image: url('texture/wallpaper01.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-        
-        /* 固定在頂部的選擇器容器 */
-        .fixed-header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            background-color: transparent;
-            z-index: 1000;
-            padding: 10px 0;
-            display: flex;
-            justify-content: center;
-        }
-        
-        .controls-container {
-            width: 90%;
-            max-width: 1600px; /* 增加到1600px以支持更寬的顯示器 */
-            text-align: center;
-            padding: 8px;
-            display: flex;
-            gap: 10px;
-        }
-        
-        .chain-selector {
-            flex: 1;
-        }
-        
-        .chain-selector select {
-            width: 100%;
-            padding: 10px;
-            font-size: 18px;
-            border-radius: 8px;
-            border: 1px solid rgba(221, 221, 221, 0.5);
-            background-color: rgba(255, 255, 255, 0.5);
-            backdrop-filter: blur(5px);
-        }
-        
-        /* 為固定頂部導航條創建空間 */
-        .content-wrapper {
-            margin-top: 80px;
-            width: 100%;
-            max-width: 1600px; /* 增加到1600px以支持更寬的顯示器 */
-            display: flex;
-            justify-content: center;
-        }
-        
-        .custom-chatbot {
-            --message-bg-user: #efeee9;
-            --message-color-user: #333333;
-            --message-bg-bot: #ffffff;
-            --message-color-bot: #333333;
-            --input-bg: rgba(255,255,255,0.8);
-            --input-border: #ddd;
-        }
-        .custom-chatbot::part(base),
-        .custom-chatbot::part(container) {
-            background: transparent !important;
-        }
-        
-        #chatbot-container {
-            width: 100%;
-            height: calc(100vh - 90px);
+            height: 100%;
             overflow: hidden;
-            max-width: 1600px; /* 增加到1600px以支持更寬的顯示器 */
         }
         
-        /* 屏幕大小適配 */
-        @media (max-width: 1920px) {
-            .controls-container, .content-wrapper, #chatbot-container {
-                max-width: 1400px;
-            }
+        .header-frame {
+            width: 100%;
+            height: 70px;
+            border: none;
+            overflow: hidden;
         }
         
-        @media (max-width: 1600px) {
-            .controls-container, .content-wrapper, #chatbot-container {
-                max-width: 1200px;
-            }
-        }
-        
-        @media (max-width: 1400px) {
-            .controls-container, .content-wrapper, #chatbot-container {
-                max-width: 1000px;
-            }
-        }
-        
-        @media (max-width: 1200px) {
-            .controls-container, .content-wrapper, #chatbot-container {
-                max-width: 800px;
-            }
-        }
-        
-        /* 移動設備適配 */
-        @media (max-width: 480px) {
-            .controls-container {
-                width: 90%;
-                padding: 5px;
-                max-width: 450px;
-            }
-            
-            .chain-selector select {
-                font-size: 16px;
-                padding: 8px;
-            }
-            
-            #chatbot-container {
-                width: 95%;
-                max-width: 450px;
-            }
-            
-            .content-wrapper {
-                width: 100%;
-                padding: 0;
-                max-width: 450px;
-            }
+        .content-frame {
+            width: 100%;
+            height: calc(100% - 70px);
+            border: none;
         }
     </style>
 </head>
 <body>
-    <!-- 固定在頂部的控制區 -->
-    <div class="fixed-header">
-        <div class="controls-container">
-            <div class="chain-selector">
-                <select id="chainSelector">
-                    <option value="c8dc18ab-627a-4a79-8192-1521875e65e5" selected>LLM：Claude sonnet 3.7</option>
-                    <option value="28265c21-827f-42d8-9cfb-b49ef6a89aba">LLM：Deepseek R1</option>
-                    <option value="97f5d567-82d4-486d-af0d-327738b84bb0">LLM：Google thinking</option>
-                    <option value="6a1fb0dc-a13c-4b47-bd6f-da7ecaad2dd3" disabled>LLM：4</option>
-                    <option value="ad9c1e27-1a90-4a8c-a25d-43af45d0d6cc" disabled>LLM：5</option>
-                </select>
-            </div>
-        </div>
-    </div>
+    <!-- 頂部框架用於選擇器 -->
+    <iframe class="header-frame" src="header.html"></iframe>
     
-    <!-- 內容區域 -->
-    <div class="content-wrapper">
-        <!-- 聊天機器人容器 -->
-        <div id="chatbot-container"></div>
-    </div>
-    <!-- 設定區域 -->
+    <!-- 內容框架用於聊天界面 -->
+    <iframe class="content-frame" id="chatFrame" src="chat.html"></iframe>
+    
     <script>
-        const CHATBOT_CONFIG = {
-            // 頭像設定
-            avatars: {
-                bot: 'https://i.ibb.co/jZL9TJ63/250224-icon.png',
-                showBotAvatar: true,
-                showUserAvatar: false,
-                avatarSize: '40px'
-            },
-            // 顏色設定
-            colors: {
-                userBubble: 'cfcfcf',  // 使用者泡泡顏色
-                userText: '#333333',
-                botBubble: '#ffffff',   // 機器人泡泡改成白色
-                botText: '#333333',
-                heart: '#FF0000'
-            },
-            // 字體大小設定
-            fontSize: {
-                welcome: "24px",
-                names: "24px",
-                messages: "18px",
-                input: "18px"
-            },
-            // 歡迎訊息
-            welcomeMessage: `<span style="font-size: 20px;">早！</span><br>
-我們來聊聊建築技術規則和台中的建管規定如何？ ！</span>`,
-            
-            apiHost: "https://aibookrates.onrender.com",
-            height: "100%",
-            width: "100%",
-            inputPlaceholder: "請輸入您的問題..."
-        };
-        
-        // 檢查設備類型和屏幕大小
-        function getScreenSize() {
-            const width = window.innerWidth;
-            if (width >= 3840) return 'uhd';
-            if (width >= 2560) return '2k';
-            if (width >= 1920) return 'fhd';
-            if (width <= 480) return 'mobile';
-            return 'standard';
-        }
-        
-        // 初始化當前選擇的chain
-        let currentChatbot = null;
-        let currentChatflowId = null;
-    </script>
-    <!-- 引入Flowise庫並設定機器人 -->
-    <script type="module">
-        import Chatbot from "https://cdn.jsdelivr.net/npm/flowise-embed/dist/web.js"
-        
-        // 等待頁面完全加載
-        document.addEventListener('DOMContentLoaded', function() {
-            // 初始化第一個選項的聊天機器人
-            currentChatflowId = document.getElementById('chainSelector').value;
-            initializeChatbot(currentChatflowId);
-            
-            // 監聽下拉選單變化
-            document.getElementById('chainSelector').addEventListener('change', function() {
-                currentChatflowId = this.value;
-                initializeChatbot(currentChatflowId);
-            });
-            
-            // 監聽窗口大小變化
-            window.addEventListener('resize', function() {
-                // 獲取當前螢幕大小
-                const screenSize = getScreenSize();
-                console.log('Screen size changed:', screenSize);
-                
-                // 移除Flowise標記
-                setTimeout(removeFlowiseElements, 500);
-            });
-        });
-        
-        // 初始化聊天機器人函數
-        function initializeChatbot(chatflowId) {
-            // 清空容器
-            const container = document.getElementById('chatbot-container');
-            container.innerHTML = '';
-            
-            // 如果已有實例，先銷毀
-            if (currentChatbot && currentChatbot.destroy) {
-                try {
-                    currentChatbot.destroy();
-                } catch (error) {
-                    console.error("Error destroying chatbot:", error);
-                }
+        // 監聽頂部框架的消息
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'chatflowChange') {
+                // 更新聊天框架的URL，加入chatflow參數
+                document.getElementById('chatFrame').src = 
+                    `chat.html?chatflowid=${event.data.chatflowId}`;
             }
-            
-            // 創建新的flowise-fullchatbot元素
-            const chatbotElement = document.createElement('flowise-fullchatbot');
-            chatbotElement.className = 'custom-chatbot';
-            container.appendChild(chatbotElement);
-            
-            // 獲取屏幕大小
-            const screenSize = getScreenSize();
-            console.log('Initializing chatbot for screen size:', screenSize);
-            
-            // 初始化聊天機器人
-            currentChatbot = Chatbot.initFull({
-                chatflowid: chatflowId,
-                apiHost: CHATBOT_CONFIG.apiHost,
-                theme: {
-                    chatWindow: {
-                        showTitle: false,
-                        backgroundColor: 'transparent',
-                        height: CHATBOT_CONFIG.height,
-                        width: CHATBOT_CONFIG.width,
-                        welcomeMessage: CHATBOT_CONFIG.welcomeMessage,
-                        fontSize: 20,
-                        renderHTML: true,
-                        botMessage: {
-                            backgroundColor: CHATBOT_CONFIG.colors.botBubble,
-                            textColor: CHATBOT_CONFIG.colors.botText,
-                            showAvatar: CHATBOT_CONFIG.avatars.showBotAvatar,
-                            avatarSrc: CHATBOT_CONFIG.avatars.bot,
-                            fontSize: CHATBOT_CONFIG.fontSize.messages
-                        },
-                        userMessage: {
-                            backgroundColor: CHATBOT_CONFIG.colors.userBubble,
-                            textColor: CHATBOT_CONFIG.colors.userText,
-                            showAvatar: CHATBOT_CONFIG.avatars.showUserAvatar,
-                            fontSize: CHATBOT_CONFIG.fontSize.messages
-                        },
-                        textInput: {
-                            placeholder: CHATBOT_CONFIG.inputPlaceholder,
-                            backgroundColor: 'var(--input-bg)',
-                            textColor: '#303235',
-                            sendButtonColor: CHATBOT_CONFIG.colors.userBubble,
-                            fontSize: CHATBOT_CONFIG.fontSize.input
-                        }
-                    },
-                    footer: {
-                        text: ''
-                    }
-                },
-                customCSS: `
-                    .flowise-container {
-                        background: transparent !important;
-                    }
-                    .chatbot-header {
-                        display: none !important;
-                    }
-                    .blue-strip {
-                        display: none !important;
-                    }
-                    .bot-message {
-                        font-size: ${CHATBOT_CONFIG.fontSize.messages} !important;
-                        background-color: ${CHATBOT_CONFIG.colors.botBubble} !important;
-                        color: ${CHATBOT_CONFIG.colors.botText} !important;
-                    }
-                    .user-message {
-                        font-size: ${CHATBOT_CONFIG.fontSize.messages} !important;
-                        background-color: ${CHATBOT_CONFIG.colors.userBubble} !important;
-                        color: ${CHATBOT_CONFIG.colors.userText} !important;
-                    }
-                    .text-input {
-                        font-size: ${CHATBOT_CONFIG.fontSize.input} !important;
-                    }
-                    .avatar {
-                        width: ${CHATBOT_CONFIG.avatars.avatarSize} !important;
-                        height: ${CHATBOT_CONFIG.avatars.avatarSize} !important;
-                    }
-                    .chatbot-footer, .flowise-credit, .powered-by, .powered-by-link {
-                        display: none !important;
-                    }
-                    .window {
-                        position: relative !important;
-                        bottom: auto !important;
-                        right: auto !important;
-                        max-height: 100% !important;
-                        height: 100% !important;
-                        width: 100% !important;
-                    }
-                    .chatbot-container {
-                        height: 100% !important;
-                    }
-                    .messages-container {
-                        height: calc(100% - 70px) !important;
-                    }
-                    
-                    /* 在寬屏上使用左右對齊的佈局 */
-                    @media (min-width: 481px) {
-                        .bot-container {
-                            justify-content: flex-start !important;
-                        }
-                        .user-container {
-                            justify-content: flex-end !important;
-                        }
-                    }
-                `
-            })
-            
-            // 移除Flowise標記
-            setTimeout(() => {
-                removeFlowiseElements();
-            }, 1000);
-        }
-        
-        // 移除Flowise相關元素的函數
-        function removeFlowiseElements() {
-            document.querySelectorAll('flowise-fullchatbot').forEach(el => {
-                if (el.shadowRoot) {
-                    const poweredByElements = el.shadowRoot.querySelectorAll('.powered-by, .chatbot-footer, .flowise-credit');
-                    poweredByElements.forEach(poweredEl => {
-                        poweredEl.style.display = 'none';
-                    });
-                }
-            });
-        }
+        });
     </script>
 </body>
 </html>
