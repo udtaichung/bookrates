@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background-image: url('texture/wallpaper01.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chatbot-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .custom-footer {
+            padding: 10px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(5px);
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            color: #303235;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .custom-footer a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        
+        .custom-footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="chatbot-container">
+        <flowise-fullchatbot></flowise-fullchatbot>
+    </div>
+    
+    <div class="custom-footer">
+        Powered by <a href="mailto:yfarch@gmail.com">yfarch</a>
+    </div>
+    
+    <script type="module">
+        import Chatbot from "https://cdn.jsdelivr.net/npm/flowise-embed/dist/web.js";
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const chatflowId = urlParams.get('chatflowid') || 'c8dc18ab-627a-4a79-8192-1521875e65e5';
+            
+            Chatbot.initFull({
+                chatflowid: chatflowId,
+                apiHost: "https://aibookrates.onrender.com",
+                theme: {
+                    chatWindow: {
+                        backgroundColor: 'rgba(255, 255, 255, 0) !important',
+                        titleBackgroundColor: 'rgba(255, 255, 255, 0) !important',
+                        titleColor: 'rgba(255, 255, 255, 0) !important',
+                        welcomeMessage: '<span style="font-size: 20px;">早！</span><br> 我們來聊聊建築技術規則和台中的建管規定如何？',
+                        fontSize: '16px',
+                        renderHTML: true
+                    },
+                    botMessage: {
+                        backgroundColor: '#f7f8ff !important',
+                        textColor: '#303235 !important',
+                        showAvatar: true,
+                        avatarSrc: 'https://raw.githubusercontent.com/zahidkhawaja/langchain-chat-nextjs/main/public/parroticon.png !important'
+                    },
+                    userMessage: {
+                        backgroundColor: '#bccad1 !important',
+                        textColor: '#000000 !important',
+                        showAvatar: true,
+                        avatarSrc: 'https://raw.githubusercontent.com/zahidkhawaja/langchain-chat-nextjs/main/public/usericon.png'
+                    }
+                },
+                customCSS: `
+                    .chatbot-header {
+                        background-color: rgba(255, 255, 255, 0) !important;
+                    }
+                    
+                    /* 隱藏官方頁腳 */
+                    .chatbot-footer {
+                        display: none !important;
+                    }
+                    
+                    /* 用戶訊息樣式強制覆蓋 */
+                    .user-message, 
+                    .user-message-container, 
+                    .user-message-box, 
+                    div[class*="user"] {
+                        background-color: #bccad1 !important;
+                    }
+                    
+                    /* 機器人訊息樣式強制覆蓋 */
+                    .bot-message, 
+                    .bot-message-container, 
+                    .bot-message-box, 
+                    div[class*="bot"] {
+                        background-color: #f7f8ff !important;
+                    }
+                    
+                    /* 強制顯示圖標 */
+                    .user-avatar img, .bot-avatar img {
+                        display: block !important;
+                        visibility: visible !important;
+                        opacity: 1 !important;
+                    }
+                `
+            });
+        });
+    </script>
+</body>
+</html>
