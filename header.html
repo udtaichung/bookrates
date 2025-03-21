@@ -17,7 +17,6 @@
         .controls-container {
             width: 90%;
             max-width: 1600px;
-            text-align: center;
             padding: 2px;
             display: flex;
             justify-content: space-between;
@@ -28,8 +27,8 @@
         .title {
             font-size: 36px;
             color: #333;
-            text-align: left;
             flex: 1;
+            text-align: left;
         }
         
         .title span.at {
@@ -38,7 +37,8 @@
         }
         
         .chain-selector {
-            width: 40%;
+            width: auto;
+            max-width: 400px;
         }
         
         .chain-selector select {
@@ -54,13 +54,13 @@
         .toggle-switch {
             display: flex;
             align-items: center;
-            margin: 0 20px;
+            margin: 0;
         }
         
         .switch {
             position: relative;
             display: inline-block;
-            width: 130px;  /* 從 125px 再加寬到 130px */
+            width: 130px;
             height: 34px;
         }
         
@@ -99,7 +99,7 @@
         }
         
         input:checked + .slider:before {
-            transform: translateX(95px);  /* 從 90px 改為 95px，配合寬度增加 */
+            transform: translateX(95px);
         }
         
         .slider-text {
@@ -109,6 +109,51 @@
             top: 50%;
             left: 50%;
             font-size: 14px;
+        }
+
+        /* Mobile styles */
+        @media screen and (max-width: 768px) {
+            .controls-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            /* First row - Title (centered) */
+            .title {
+                font-size: 22px;
+                text-align: center;
+                width: 100%;
+                transform: scale(1);
+                margin: -15px 0;
+            }
+            
+            .title span.at {
+                font-size: 16px;
+            }
+            
+            /* Second row - Toggle switch and Chain selector */
+            .controls-row {
+                display: flex;
+                width: 100%;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .toggle-switch {
+                transform: scale(0.8);
+                margin-left: -20px;
+            }
+            
+            .chain-selector {
+                transform: scale(0.8);
+                margin-right: -20px;
+            }
+            
+            .chain-selector select {
+                font-size: 16px;
+                padding: 8px;
+            }
         }
     </style>
 </head>
@@ -135,15 +180,63 @@
     </div>
     
     <script>
+        // For mobile, we need to restructure the DOM
+        function adjustForMobile() {
+            if (window.innerWidth <= 768) {
+                // Get the container
+                const container = document.querySelector('.controls-container');
+                
+                // Create a row for toggle and selector if it doesn't exist
+                if (!document.querySelector('.controls-row')) {
+                    const controlsRow = document.createElement('div');
+                    controlsRow.className = 'controls-row';
+                    
+                    // Move toggle switch and chain selector to this row
+                    const toggleSwitch = document.querySelector('.toggle-switch');
+                    const chainSelector = document.querySelector('.chain-selector');
+                    
+                    // Only move if they're direct children of container
+                    if (toggleSwitch.parentNode === container) {
+                        controlsRow.appendChild(toggleSwitch);
+                    }
+                    
+                    if (chainSelector.parentNode === container) {
+                        controlsRow.appendChild(chainSelector);
+                    }
+                    
+                    container.appendChild(controlsRow);
+                }
+            } else {
+                // Check if we're in desktop mode but still have the controls-row
+                const controlsRow = document.querySelector('.controls-row');
+                if (controlsRow) {
+                    // Move elements back to container
+                    const container = document.querySelector('.controls-container');
+                    const toggleSwitch = document.querySelector('.toggle-switch');
+                    const chainSelector = document.querySelector('.chain-selector');
+                    
+                    container.appendChild(toggleSwitch);
+                    container.appendChild(chainSelector);
+                    
+                    // Remove the row
+                    controlsRow.remove();
+                }
+            }
+        }
+
+        // Run on load and on resize
+        window.addEventListener('load', adjustForMobile);
+        window.addEventListener('resize', adjustForMobile);
+        
         document.getElementById('chainSelector').addEventListener('change', function() {
-            // 向父框架發送消息，通知選擇器變更
+            // Send message to parent frame notifying of selector change
             window.parent.postMessage({
                 type: 'chatflowChange',
                 chatflowId: this.value
             }, '*');
         });
         
-        // 初始化時也發送一次
+        // Also send on init
         window.onload = function() {
             window.parent.postMessage({
                 type: 'chatflowChange',
@@ -152,12 +245,12 @@
         };
         
         document.getElementById('modeToggle').addEventListener('change', function() {
-            const text = this.checked ? '說明文件' : 'CHATBOT';  // 交換文字順序
+            const text = this.checked ? '說明文件' : 'CHATBOT';
             this.parentElement.querySelector('.slider-text').textContent = text;
             
             window.parent.postMessage({
                 type: 'modeChange',
-                mode: this.checked ? 'intro' : 'chat'  // 交換模式順序
+                mode: this.checked ? 'intro' : 'chat'
             }, '*');
         });
     </script>
