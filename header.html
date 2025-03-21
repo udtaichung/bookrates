@@ -214,17 +214,12 @@
                 controlsRow.appendChild(chainSelector);
                 container.appendChild(controlsRow);
                 
-                // Apply mobile styles
-                title.style.fontSize = '36px';
-                title.style.textAlign = 'center';
-                title.style.transform = 'scale(2.2)';
-                title.style.margin = '-15px 0';
+                // Apply mobile styles with !important
+                title.style.cssText = 'font-size: 36px !important; text-align: center !important; width: 100% !important; margin: 10px 0 !important;';
                 
-                toggleSwitch.style.transform = 'scale(0.8)';
-                toggleSwitch.style.marginLeft = '-20px';
+                toggleSwitch.style.cssText = 'transform: scale(0.8) !important; margin-left: 0 !important;';
                 
-                chainSelector.style.transform = 'scale(1.5)';
-                chainSelector.style.marginRight = '-20px';
+                chainSelector.style.cssText = 'transform: scale(0.8) !important; margin-right: 0 !important;';
             }
         }
         
