@@ -207,20 +207,23 @@
                 // Create second row for controls
                 const controlsRow = document.createElement('div');
                 controlsRow.className = 'controls-row';
+                controlsRow.style.display = 'flex';
+                controlsRow.style.justifyContent = 'space-between';
+                controlsRow.style.width = '100%';
                 controlsRow.appendChild(toggleSwitch);
                 controlsRow.appendChild(chainSelector);
                 container.appendChild(controlsRow);
                 
                 // Apply mobile styles
-                title.style.fontSize = '26px';
+                title.style.fontSize = '22px';
                 title.style.textAlign = 'center';
-                title.style.transform = 'scale(1)';
+                title.style.transform = 'scale(0.6)';
                 title.style.margin = '-15px 0';
                 
-                toggleSwitch.style.transform = 'scale(0.8)';
+                toggleSwitch.style.transform = 'scale(0.6)';
                 toggleSwitch.style.marginLeft = '-20px';
                 
-                chainSelector.style.transform = 'scale(0.8)';
+                chainSelector.style.transform = 'scale(0.6)';
                 chainSelector.style.marginRight = '-20px';
             }
         }
