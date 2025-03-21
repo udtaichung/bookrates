@@ -9,37 +9,46 @@
             margin: 0;
             padding: 0;
             height: 100%;
-            overflow: hidden;
+            background-image: url('texture/wallpaper01.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
         }
-        
-        .header-frame {
+
+        #headerFrame {
             width: 100%;
-            height: 70px;
+            height: 80px;
             border: none;
-            overflow: hidden;
+            background: transparent;
         }
-        
-        .content-frame {
+
+        #chatFrame {
             width: 100%;
-            height: calc(100% - 70px);
+            height: calc(100vh - 80px);
             border: none;
+            background: transparent;
+        }
+
+        .content {
+            position: relative;
+            z-index: 1;
         }
     </style>
 </head>
 <body>
-    <!-- 頂部框架用於選擇器 -->
-    <iframe class="header-frame" src="header.html"></iframe>
-    
-    <!-- 內容框架用於聊天界面 -->
-    <iframe class="content-frame" id="chatFrame" src="chat.html"></iframe>
-    
+    <div class="content">
+        <iframe id="headerFrame" src="header.html"></iframe>
+        <iframe id="chatFrame" src="chat.html"></iframe>
+    </div>
     <script>
-        // 監聽頂部框架的消息
         window.addEventListener('message', function(event) {
             if (event.data && event.data.type === 'chatflowChange') {
-                // 更新聊天框架的URL，加入chatflow參數
                 document.getElementById('chatFrame').src = 
                     `chat.html?chatflowid=${event.data.chatflowId}`;
+            }
+            else if (event.data && event.data.type === 'modeChange') {
+                document.getElementById('chatFrame').src = 
+                    event.data.mode === 'chat' ? 'chat.html' : 'intro.html';
             }
         });
     </script>
