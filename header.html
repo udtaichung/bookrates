@@ -259,8 +259,26 @@
             }
         }
         
-        // 頁面載入時調整布局
-        window.addEventListener('load', adjustLayout);
+        // 設定初始顯示狀態
+        window.addEventListener('load', function() {
+            // 設定初始顯示文字為「說明文件」
+            document.querySelector('.slider-text').textContent = '說明文件';
+            
+            // 調整布局
+            adjustLayout();
+            
+            // 向父頁面發送初始模式訊息（預設為 chat 模式）
+            window.parent.postMessage({
+                type: 'modeChange',
+                mode: 'chat'
+            }, '*');
+            
+            // 向父頁面發送初始選擇的模型
+            window.parent.postMessage({
+                type: 'chatflowChange',
+                chatflowId: document.getElementById('chainSelector').value
+            }, '*');
+        });
         
         // 視窗大小改變時調整布局
         window.addEventListener('resize', adjustLayout);
@@ -274,27 +292,16 @@
             }, '*');
         });
         
-        // 頁面載入時向父頁面發送初始選擇的模型
-        window.onload = function() {
-            window.parent.postMessage({
-                type: 'chatflowChange',
-                chatflowId: document.getElementById('chainSelector').value
-            }, '*');
-            
-            // 也同時調整布局
-            adjustLayout();
-        };
-        
-        // 模式切換開關事件處理
+        // 模式切換開關事件處理 - 反轉邏輯
         document.getElementById('modeToggle').addEventListener('change', function() {
-            // 更新滑動器文字
-            const text = this.checked ? '說明文件' : 'CHATBOT';
+            // 更新滑動器文字 - 反轉邏輯
+            const text = this.checked ? 'CHATBOT' : '說明文件';
             this.parentElement.querySelector('.slider-text').textContent = text;
             
-            // 向父頁面發送模式變更訊息
+            // 向父頁面發送模式變更訊息 - 反轉邏輯
             window.parent.postMessage({
                 type: 'modeChange',
-                mode: this.checked ? 'intro' : 'chat'
+                mode: this.checked ? 'chat' : 'intro'
             }, '*');
         });
     </script>
