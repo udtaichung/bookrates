@@ -111,8 +111,8 @@
             font-size: 14px;
         }
 
-        /* Mobile styles */
-        @media screen and (max-width: 768px) {
+        /* Mobile styles - using aspect ratio instead of fixed width */
+        @media screen and (max-aspect-ratio: 4/3) {
             .controls-container {
                 flex-direction: column;
                 align-items: center;
@@ -124,7 +124,7 @@
                 font-size: 22px;
                 text-align: center;
                 width: 100%;
-                transform: scale(1);
+                transform: scale(0.6);
                 margin: -15px 0;
             }
             
@@ -141,12 +141,12 @@
             }
             
             .toggle-switch {
-                transform: scale(0.8);
+                transform: scale(0.6);
                 margin-left: -20px;
             }
             
             .chain-selector {
-                transform: scale(0.8);
+                transform: scale(0.6);
                 margin-right: -20px;
             }
             
@@ -182,7 +182,8 @@
     <script>
         // For mobile, we need to restructure the DOM
         function adjustForMobile() {
-            if (window.innerWidth <= 768) {
+            // Check aspect ratio instead of width
+            if (window.innerWidth / window.innerHeight < 4/3) {
                 // Get the container
                 const container = document.querySelector('.controls-container');
                 
