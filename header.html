@@ -92,7 +92,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #2196F3;
+            background-color: #2196F3; /* 藍色背景 - 預設為「說明文件」 */
             transition: .4s;
             border-radius: 34px;
         }
@@ -112,7 +112,7 @@
         
         /* 選中狀態的背景色 */
         input:checked + .slider {
-            background-color: #4CAF50;
+            background-color: #4CAF50; /* 綠色背景 - 變更為「CHATBOT」 */
         }
         
         /* 選中狀態的按鈕位置 */
@@ -261,19 +261,26 @@
         
         // 設定初始顯示狀態
         window.addEventListener('load', function() {
-            // 設定初始顯示文字為「說明文件」
-            document.querySelector('.slider-text').textContent = '說明文件';
+            // 取得開關元素
+            const toggleSwitch = document.getElementById('modeToggle');
+            const sliderText = document.querySelector('.slider-text');
+            
+            // 設定初始文字為「說明文件」
+            sliderText.textContent = '說明文件';
+            
+            // 確保開關處於未勾選狀態（重要）
+            toggleSwitch.checked = false;
             
             // 調整布局
             adjustLayout();
             
-            // 向父頁面發送初始模式訊息（預設為 chat 模式）
+            // 發送初始模式訊息 - 應該是「聊天機器人」模式
             window.parent.postMessage({
                 type: 'modeChange',
                 mode: 'chat'
             }, '*');
             
-            // 向父頁面發送初始選擇的模型
+            // 發送初始選擇的模型
             window.parent.postMessage({
                 type: 'chatflowChange',
                 chatflowId: document.getElementById('chainSelector').value
@@ -292,17 +299,24 @@
             }, '*');
         });
         
-        // 模式切換開關事件處理 - 反轉邏輯
+        // 模式切換開關事件處理
         document.getElementById('modeToggle').addEventListener('change', function() {
-            // 更新滑動器文字 - 反轉邏輯
-            const text = this.checked ? 'CHATBOT' : '說明文件';
-            this.parentElement.querySelector('.slider-text').textContent = text;
-            
-            // 向父頁面發送模式變更訊息 - 反轉邏輯
-            window.parent.postMessage({
-                type: 'modeChange',
-                mode: this.checked ? 'chat' : 'intro'
-            }, '*');
+            // 根據勾選狀態更新文字和頁面
+            if (this.checked) {
+                // 勾選狀態（綠色）- 顯示 CHATBOT 文字，但實際顯示說明文件頁面
+                this.parentElement.querySelector('.slider-text').textContent = 'CHATBOT';
+                window.parent.postMessage({
+                    type: 'modeChange',
+                    mode: 'intro'
+                }, '*');
+            } else {
+                // 未勾選狀態（藍色）- 顯示說明文件文字，但實際顯示聊天機器人頁面
+                this.parentElement.querySelector('.slider-text').textContent = '說明文件';
+                window.parent.postMessage({
+                    type: 'modeChange',
+                    mode: 'chat'
+                }, '*');
+            }
         });
     </script>
 </body>
