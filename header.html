@@ -2,6 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -19,6 +20,7 @@
             max-width: 1600px;
             padding: 2px;
             display: flex;
+            flex-direction: row;
             justify-content: space-between;
             align-items: center;
             gap: 10px;
@@ -111,15 +113,20 @@
             font-size: 14px;
         }
 
-        /* Mobile styles */
-        @media screen and (max-width: 768px), (max-aspect-ratio: 4/3) and (hover: none) {
+        .controls-row {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Force mobile mode for specific screens */
+        @media only screen and (max-width: 768px) {
             .controls-container {
                 flex-direction: column;
                 align-items: center;
-                gap: 10px;
             }
             
-            /* First row - Title (centered) */
             .title {
                 font-size: 22px;
                 text-align: center;
@@ -130,14 +137,6 @@
             
             .title span.at {
                 font-size: 16px;
-            }
-            
-            /* Second row - Toggle switch and Chain selector */
-            .controls-row {
-                display: flex;
-                width: 100%;
-                justify-content: space-between;
-                align-items: center;
             }
             
             .toggle-switch {
@@ -154,11 +153,16 @@
                 font-size: 16px;
                 padding: 8px;
             }
+            
+            .mobile-layout {
+                display: flex;
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="controls-container">
+    <div class="controls-container" id="controlsContainer">
         <div class="title">建築技術規則 <span class="at">@</span> 台中建管 AI</div>
         <div class="toggle-switch">
             <label class="switch">
@@ -180,64 +184,64 @@
     </div>
     
     <script>
-        // For mobile, we need to restructure the DOM
-        function adjustForMobile() {
-            // Check aspect ratio instead of width
-            if (window.innerWidth / window.innerHeight < 4/3) {
-                // Get the container
-                const container = document.querySelector('.controls-container');
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                  (window.innerWidth <= 768);
+        }
+        
+        function setupLayout() {
+            const container = document.getElementById('controlsContainer');
+            const title = document.querySelector('.title');
+            const toggleSwitch = document.querySelector('.toggle-switch');
+            const chainSelector = document.querySelector('.chain-selector');
+            
+            // Force mobile layout
+            if (isMobileDevice()) {
+                // Clear container
+                container.innerHTML = '';
+                container.style.flexDirection = 'column';
                 
-                // Create a row for toggle and selector if it doesn't exist
-                if (!document.querySelector('.controls-row')) {
-                    const controlsRow = document.createElement('div');
-                    controlsRow.className = 'controls-row';
-                    
-                    // Move toggle switch and chain selector to this row
-                    const toggleSwitch = document.querySelector('.toggle-switch');
-                    const chainSelector = document.querySelector('.chain-selector');
-                    
-                    // Only move if they're direct children of container
-                    if (toggleSwitch.parentNode === container) {
-                        controlsRow.appendChild(toggleSwitch);
-                    }
-                    
-                    if (chainSelector.parentNode === container) {
-                        controlsRow.appendChild(chainSelector);
-                    }
-                    
-                    container.appendChild(controlsRow);
-                }
-            } else {
-                // Check if we're in desktop mode but still have the controls-row
-                const controlsRow = document.querySelector('.controls-row');
-                if (controlsRow) {
-                    // Move elements back to container
-                    const container = document.querySelector('.controls-container');
-                    const toggleSwitch = document.querySelector('.toggle-switch');
-                    const chainSelector = document.querySelector('.chain-selector');
-                    
-                    container.appendChild(toggleSwitch);
-                    container.appendChild(chainSelector);
-                    
-                    // Remove the row
-                    controlsRow.remove();
-                }
+                // Add title
+                container.appendChild(title);
+                
+                // Create second row for controls
+                const controlsRow = document.createElement('div');
+                controlsRow.className = 'controls-row';
+                controlsRow.appendChild(toggleSwitch);
+                controlsRow.appendChild(chainSelector);
+                container.appendChild(controlsRow);
+                
+                // Apply mobile styles
+                title.style.fontSize = '22px';
+                title.style.textAlign = 'center';
+                title.style.transform = 'scale(0.6)';
+                title.style.margin = '-15px 0';
+                
+                toggleSwitch.style.transform = 'scale(0.6)';
+                toggleSwitch.style.marginLeft = '-20px';
+                
+                chainSelector.style.transform = 'scale(0.6)';
+                chainSelector.style.marginRight = '-20px';
             }
         }
-
-        // Run on load and on resize
-        window.addEventListener('load', adjustForMobile);
-        window.addEventListener('resize', adjustForMobile);
+        
+        // Run on load
+        window.addEventListener('load', setupLayout);
+        
+        // Run on resize with debounce
+        let resizeTimer;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(setupLayout, 250);
+        });
         
         document.getElementById('chainSelector').addEventListener('change', function() {
-            // Send message to parent frame notifying of selector change
             window.parent.postMessage({
                 type: 'chatflowChange',
                 chatflowId: this.value
             }, '*');
         });
         
-        // Also send on init
         window.onload = function() {
             window.parent.postMessage({
                 type: 'chatflowChange',
