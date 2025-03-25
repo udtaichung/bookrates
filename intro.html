@@ -63,6 +63,33 @@
             font-weight: bold;
             font-size: 24px;  /* 強調文字 */
         }
+        
+        /* 折疊功能相關樣式 */
+        .collapsible {
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .collapsible:hover {
+            text-decoration: underline;
+        }
+        
+        .collapsible::after {
+            content: " ▼";
+            font-size: 16px;
+            color: red;
+        }
+        
+        .collapsible.active::after {
+            content: " ▲";
+        }
+        
+        .content {
+            display: none;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
@@ -124,66 +151,71 @@
                 臺中市領有使用執照建築基地範圍內部分土地申請建築處理原則<br>
                 臺中市騎樓及無遮簷人行道設置標準<br>
                 地質敏感區基地地質調查及地質安全評估作業準則<br>
-                <span class="highlight">細部計畫-土管(持續補充中)</span><br>
-                舊有市區及一至五期<br>
-                干城商業地區<br>
-                配合臺中都會區鐵路高架捷運化計畫臺中車站地區<br>
-                旱溪地區<br>
-                樹德地區<br>
-                後庄里地區<br>
-                四張犂地區<br>
-                配合臺中都會區大眾捷運系統烏日文心北屯線建設計畫捷運機廠<br>
-                東光、三和地區<br>
-                軍功及水景里地區<br>
-                水湳機場原址整體開發區<br>
-                西屯地區<br>
-                福星路附近地區<br>
-                新市政中心專用區<br>
-                新市政中心專用區西側<br>
-                新市政中心專用區南側<br>
-                豐樂里附近地區<br>
-                楓樹里附近地區<br>
-                水堀頭地區<br>
-                福安里附近<br>
-                文山及春社里地區<br>
-                整體開發地區單元一<br>
-                整體開發地區單元二<br>
-                整體開發地區單元三<br>
-                整體開發地區單元四<br>
-                整體開發地區單元五<br>
-                整體開發單元六、七(大慶車站附近)<br>
-                整體開發地區單元八<br>
-                整體開發地區單元九、十、十一<br>
-                整體開發地區單元十二<br>
-                整體開發地區單元十三<br>
-                整體開發地區單元十四<br>
-                大里範圍<br>
-                大里機四機關用地變住宅區<br>
-                大里草湖範圍<br>
-                軟體產業專用區範圍<br>
-                擴大大里草湖範圍<br>
-                太平及擴大範圍<br>
-                太平中平範圍<br>
-                太平新光範圍<br>
-                樹德路東側範圍<br>
-                霧峰地區<br>
-                霧峰三七號道路南側及三十號道路東側住宅區<br>
-                霧峰鄉農會附近範圍<br>
-                省議會高爾夫球場西側、神農大帝廟南側、福新路<br>
-                烏日地區<br>
-                大肚地區<br>
-                高鐵站區<br>
-                台中港特定區<br>
-                台中港特定區(市鎮中心)<br>
-                台中港特定區(三塊厝地區)<br>
-                后里都市計畫細部計畫<br>
-                豐原地區(配合豐原三通)<br>
-                豐原地區(豐交範圍)<br>
-                大雅地區<br>
-                潭子地區<br>
-                神岡地區<br>
-                東勢地區<br>
-                ------<br>
+                
+                <div>
+                    <span class="highlight collapsible">細部計畫-土地使用分區管制要點(持續補充中)</span>
+                    <div class="content">
+                        舊有市區及一至五期<br>
+                        干城商業地區<br>
+                        配合臺中都會區鐵路高架捷運化計畫臺中車站地區<br>
+                        旱溪地區<br>
+                        樹德地區<br>
+                        後庄里地區<br>
+                        四張犂地區<br>
+                        配合臺中都會區大眾捷運系統烏日文心北屯線建設計畫捷運機廠<br>
+                        東光、三和地區<br>
+                        軍功及水景里地區<br>
+                        水湳機場原址整體開發區<br>
+                        西屯地區<br>
+                        福星路附近地區<br>
+                        新市政中心專用區<br>
+                        新市政中心專用區西側<br>
+                        新市政中心專用區南側<br>
+                        豐樂里附近地區<br>
+                        楓樹里附近地區<br>
+                        水堀頭地區<br>
+                        福安里附近<br>
+                        文山及春社里地區<br>
+                        整體開發地區單元一<br>
+                        整體開發地區單元二<br>
+                        整體開發地區單元三<br>
+                        整體開發地區單元四<br>
+                        整體開發地區單元五<br>
+                        整體開發單元六、七(大慶車站附近)<br>
+                        整體開發地區單元八<br>
+                        整體開發地區單元九、十、十一<br>
+                        整體開發地區單元十二<br>
+                        整體開發地區單元十三<br>
+                        整體開發地區單元十四<br>
+                        大里範圍<br>
+                        大里機四機關用地變住宅區<br>
+                        大里草湖範圍<br>
+                        軟體產業專用區範圍<br>
+                        擴大大里草湖範圍<br>
+                        太平及擴大範圍<br>
+                        太平中平範圍<br>
+                        太平新光範圍<br>
+                        樹德路東側範圍<br>
+                        霧峰地區<br>
+                        霧峰三七號道路南側及三十號道路東側住宅區<br>
+                        霧峰鄉農會附近範圍<br>
+                        省議會高爾夫球場西側、神農大帝廟南側、福新路<br>
+                        烏日地區<br>
+                        大肚地區<br>
+                        高鐵站區<br>
+                        台中港特定區<br>
+                        台中港特定區(市鎮中心)<br>
+                        台中港特定區(三塊厝地區)<br>
+                        后里都市計畫細部計畫<br>
+                        豐原地區(配合豐原三通)<br>
+                        豐原地區(豐交範圍)<br>
+                        大雅地區<br>
+                        潭子地區<br>
+                        神岡地區<br>
+                        東勢地區<br>
+                    </div>
+                </div><br>
+                § 特別 §<br>
                 容積移轉代金估計<br>
                 ------<br>
                 1.小幫手理解公式並支援計算，請詳細列舉所需參數，如果參數有缺，則無法運算。<br>
@@ -191,9 +223,26 @@
                 3.如小幫手回答有偏差或有誤，可善用記憶功能，於下個問題加上「承上題，...」，小幫手會納入前題回答作思考。<br>
                 4.<span class="highlight">如有產生較大錯誤之處，煩請務必利用左下的回饋系統，留言給予指教！</span><br>
                 您的參與和留言，會讓系統更加完善！<br>
-                @250324
             </div>
         </div>
     </div>
+    
+    <script>
+        // 添加折疊功能
+        document.addEventListener('DOMContentLoaded', function() {
+            var coll = document.getElementsByClassName("collapsible");
+            for (var i = 0; i < coll.length; i++) {
+                coll[i].addEventListener("click", function() {
+                    this.classList.toggle("active");
+                    var content = this.nextElementSibling;
+                    if (content.style.display === "block") {
+                        content.style.display = "none";
+                    } else {
+                        content.style.display = "block";
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
