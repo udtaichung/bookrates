@@ -41,14 +41,34 @@
         <iframe id="chatFrame" src="chat.html"></iframe>
     </div>
     <script>
+        // 當前模式，默認為聊天模式
+        let currentMode = 'chat';
+        // 當前選定的 chatflowId
+        let currentChatflowId = 'c8dc18ab-627a-4a79-8192-1521875e65e5';
+        
+        // 處理從 header 接收的消息
         window.addEventListener('message', function(event) {
             if (event.data && event.data.type === 'chatflowChange') {
-                document.getElementById('chatFrame').src = 
-                    `chat.html?chatflowid=${event.data.chatflowId}`;
+                // 儲存當前選定的 chatflowId
+                currentChatflowId = event.data.chatflowId;
+                
+                // 如果目前是聊天模式，則更新聊天框架的 URL
+                if (currentMode === 'chat') {
+                    document.getElementById('chatFrame').src = 
+                        `chat.html?chatflowid=${currentChatflowId}`;
+                }
             }
             else if (event.data && event.data.type === 'modeChange') {
-                document.getElementById('chatFrame').src = 
-                    event.data.mode === 'chat' ? 'chat.html' : 'intro.html';
+                // 更新當前模式
+                currentMode = event.data.mode;
+                
+                // 根據模式切換顯示的頁面
+                if (currentMode === 'chat') {
+                    document.getElementById('chatFrame').src = 
+                        `chat.html?chatflowid=${currentChatflowId}`;
+                } else {
+                    document.getElementById('chatFrame').src = 'intro.html';
+                }
             }
         });
     </script>
