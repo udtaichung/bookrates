@@ -75,6 +75,14 @@
     </div>
 
     <script>
+        // 獲取 URL 參數
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+        
         const CHATBOT_CONFIG = {            
             // 頭像設定
             avatars: {
@@ -103,9 +111,9 @@
             // 歡迎訊息
             welcomeMessage: '<span style="font-size: 24px;">早！</span><br> 我們來聊聊建築技術規則和台中的建管規定如何？',
             
-            chatflowId: "c8dc18ab-627a-4a79-8192-1521875e65e5",
+            // 從 URL 參數獲取 chatflowId，如果沒有則使用默認值
+            chatflowId: getUrlParameter('chatflowid') || "c8dc18ab-627a-4a79-8192-1521875e65e5",
             apiHost: "https://aibookrates.onrender.com",
-
         };
 
         // 添加滾動監聽函數
