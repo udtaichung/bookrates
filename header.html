@@ -28,6 +28,13 @@
             gap: 10px;
         }
         
+        /* 下拉選單分隔線樣式 */
+        .chain-selector select option:disabled {
+         font-weight: bold;
+         color: #666;
+         background-color: #f0f0f0;
+        }
+
         /* 標題樣式 */
         .title {
             font-size: 36px;
@@ -226,7 +233,7 @@
                     <option value="97f5d567-82d4-486d-af0d-327738b84bb0">LLM：Gemini flash 2.0 Thinking </option>
                     <option disabled>--- Agent ---</option>
                     <option value="8d39f4ca-5790-46d7-a968-f11cb828bd80">LLM：Agent:WebSeach (會找網路資料)</option>
-                    <option value="8d39f4ca-5790-46d7-a968-f11cb828bd80" disabled>LLM：newest</option>
+                    <!-- <option value="8d39f4ca-5790-46d7-a968-f11cb828bd80" disabled>LLM：newest</option> -->
                 </select>
             </div>
         </div>
