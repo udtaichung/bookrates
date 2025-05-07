@@ -419,44 +419,82 @@
             try {
                 document.getElementById('loadingOverlay').style.display = 'flex';
                 const textContent = getChatContent();
-                const htmlContent = formatTextToHTML(textContent);
-                const contentDiv = document.getElementById('pdf-content');
-                contentDiv.innerHTML = htmlContent;
-                contentDiv.style.display = 'block';
-                
-                await document.fonts.ready;
-                const canvas = await html2canvas(contentDiv, {
-                    scale: 2,
-                    useCORS: true,
-                    logging: false,
-                    letterRendering: true,
-                    allowTaint: true,
-                });
-                
+                // 設定 PDF 與 Canvas 參數
+                const pdfWidth = 210; // mm
+                const pdfHeight = 297; // mm
+                const dpi = 96; // 螢幕解析度
+                const mmToPx = mm => Math.floor(mm * dpi / 25.4);
+                const canvasWidth = mmToPx(pdfWidth);
+                const canvasHeight = mmToPx(pdfHeight);
+                const lineHeight = 32; // px
+                const fontSize = 20; // px
+                const fontFamily = 'Microsoft JhengHei, MingLiU, PMingLiU, SimSun, Arial, sans-serif';
+                // 將文字分行
+                function wrapText(ctx, text, maxWidth) {
+                    const words = text.split(/(\s+)/);
+                    let lines = [];
+                    let line = '';
+                    for (let n = 0; n < words.length; n++) {
+                        const testLine = line + words[n];
+                        const metrics = ctx.measureText(testLine);
+                        if (metrics.width > maxWidth && n > 0) {
+                            lines.push(line);
+                            line = words[n];
+                        } else {
+                            line = testLine;
+                        }
+                    }
+                    lines.push(line);
+                    return lines;
+                }
+                // 建立 canvas
+                const canvas = document.createElement('canvas');
+                canvas.width = canvasWidth;
+                canvas.height = canvasHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.font = `${fontSize}px ${fontFamily}`;
+                ctx.fillStyle = '#222';
+                ctx.textBaseline = 'top';
+                const margin = 40;
+                const maxTextWidth = canvasWidth - margin * 2;
+                // 分割內容
+                const lines = textContent.split('\n');
+                let renderedLines = [];
+                for (let line of lines) {
+                    if (line.trim() === '') {
+                        renderedLines.push('');
+                        continue;
+                    }
+                    const wrapped = wrapText(ctx, line, maxTextWidth);
+                    renderedLines.push(...wrapped);
+                }
+                // 分頁
+                const linesPerPage = Math.floor((canvasHeight - margin * 2) / lineHeight);
+                const totalPages = Math.ceil(renderedLines.length / linesPerPage);
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF({
                     orientation: 'portrait',
                     unit: 'mm',
                     format: 'a4'
                 });
-                
-                const imgWidth = 210;
-                const pageHeight = 297;
-                const imgHeight = canvas.height * imgWidth / canvas.width;
-                let heightLeft = imgHeight;
-                let position = 0;
-                
-                pdf.addImage(canvas, 'JPEG', 0, position, imgWidth, imgHeight, '', 'FAST');
-                heightLeft -= pageHeight;
-                
-                while (heightLeft > 0) {
-                    position = heightLeft - imgHeight;
-                    pdf.addPage();
-                    pdf.addImage(canvas, 'JPEG', 0, position, imgWidth, imgHeight, '', 'FAST');
-                    heightLeft -= pageHeight;
+                for (let page = 0; page < totalPages; page++) {
+                    ctx.fillStyle = '#fff';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = '#222';
+                    ctx.font = `${fontSize}px ${fontFamily}`;
+                    let y = margin;
+                    for (let i = 0; i < linesPerPage; i++) {
+                        const idx = page * linesPerPage + i;
+                        if (idx >= renderedLines.length) break;
+                        ctx.fillText(renderedLines[idx], margin, y);
+                        y += lineHeight;
+                    }
+                    const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                    if (page > 0) pdf.addPage();
+                    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
                 }
-                
-                contentDiv.style.display = 'none';
                 pdf.save(`建築技術規則AI聊天記錄_${new Date().toISOString().slice(0, 10)}.pdf`);
                 document.getElementById('loadingOverlay').style.display = 'none';
                 console.log('PDF 檔案下載完成');
