@@ -12,10 +12,12 @@
             --input-bg: rgba(255,255,255,0.8);
             --input-border: #ddd;
         }
+
         .custom-chatbot::part(base),
         .custom-chatbot::part(container) {
             background: transparent !important;
         }
+
         body {
             margin: 0;
             padding: 0;
@@ -26,11 +28,13 @@
             display: flex;
             flex-direction: column;
         }
+        
         .chatbot-container {
             flex: 1;
             position: relative;
             overflow: hidden;
         }
+
         .custom-chatbot {
             position: absolute !important;
             top: 0 !important;
@@ -38,6 +42,7 @@
             right: 0 !important;
             bottom: 0 !important;
         }
+        
         .custom-footer {
             padding: 10px;
             text-align: center;
@@ -48,6 +53,16 @@
             color: #303235;
             border-top: 1px solid rgba(0, 0, 0, 0.1);
         }
+        
+        .custom-footer a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        
+        .custom-footer a:hover {
+            text-decoration: underline;
+        }
+        
         .pdf-button {
             position: absolute;
             right: 20px;
@@ -64,14 +79,17 @@
             z-index: 1000;
             transition: background-color 0.3s ease;
         }
+        
         .pdf-button:hover {
             background-color: #e0e0e0;
         }
+        
         .pdf-icon {
             width: 20px;
             height: 20px;
             fill: #555;
         }
+        
         .export-dialog {
             display: none;
             position: absolute;
@@ -83,6 +101,7 @@
             padding: 12px;
             z-index: 1001;
         }
+        
         .export-dialog button {
             display: block;
             width: 100%;
@@ -95,9 +114,11 @@
             text-align: left;
             transition: background-color 0.3s;
         }
+        
         .export-dialog button:hover {
             background-color: #e0e0e0;
         }
+        
         .loading-overlay {
             display: none;
             position: fixed;
@@ -111,6 +132,7 @@
             align-items: center;
             flex-direction: column;
         }
+        
         .loading-spinner {
             border: 5px solid #f3f3f3;
             border-top: 5px solid #3498db;
@@ -120,53 +142,98 @@
             animation: spin 2s linear infinite;
             margin-bottom: 20px;
         }
+        
         .loading-text {
             color: white;
             font-family: Arial, sans-serif;
             font-size: 16px;
         }
+        
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
         #pdf-content {
             display: none;
-            font-family: "Noto Sans TC", "Microsoft JhengHei", "MingLiU", "PMingLiU", "SimSun", sans-serif;
+            font-family: "Microsoft JhengHei", "MingLiU", "PMingLiU", "SimSun", sans-serif;
             padding: 20px;
             background-color: white;
             width: 210mm;
             box-sizing: border-box;
+        }
+        
+        #pdf-content h1 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        #pdf-content .timestamp {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        #pdf-content .divider {
+            border-top: 1px solid #ddd;
+            margin: 15px 0;
+        }
+        
+        #pdf-content .message-block {
+            margin-bottom: 10px;
+        }
+        
+        #pdf-content .speaker {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        #pdf-content .message-content {
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+        
+        #pdf-content .footer {
+            font-size: 10px;
+            color: #777;
+            text-align: center;
+            margin-top: 30px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
         }
     </style>
 </head>
 <body>
     <div class="chatbot-container">
         <flowise-fullchatbot class="custom-chatbot"></flowise-fullchatbot>
-
+        
         <button class="pdf-button" id="saveButton" title="另存聊天記錄">
             <svg class="pdf-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
             </svg>
         </button>
+        
         <div class="export-dialog" id="exportDialog">
             <button id="saveTxtButton">儲存為 TXT</button>
             <button id="savePdfButton">儲存為 PDF</button>
+            <button id="saveWordButton">儲存為 Word</button>
         </div>
     </div>
-
+    
     <div class="custom-footer">
         回答僅供參考，請善盡查證義務，並遵循當地法律法規。
     </div>
-
+    
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner"></div>
-        <div class="loading-text">正在生成 PDF，請稍候...</div>
+        <div class="loading-text">正在生成文件，請稍候...</div>
     </div>
+    
     <div id="pdf-content"></div>
 
-    <!-- PDF-LIB 與 fontkit -->
-    <script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
-    <script src="https://unpkg.com/@pdf-lib/fontkit@0.0.4/dist/fontkit.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/docx@7.8.2/build/index.min.js"></script>
 
     <script>
         function getUrlParameter(name) {
@@ -175,8 +242,8 @@
             var results = regex.exec(location.search);
             return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
         }
-
-        const CHATBOT_CONFIG = {
+        
+        const CHATBOT_CONFIG = {            
             avatars: {
                 bot: 'texture/bot.png',
                 user: 'texture/user.png',
@@ -185,9 +252,9 @@
                 avatarSize: '28px'
             },
             colors: {
-                userBubble: '#bbc4cc',
+                userBubble: '#BBC4CC',
                 userText: '#101010',
-                botBubble: '#f7f8ff',
+                botBubble: '#F7F8FF',
                 botText: '#303235'
             },
             fontSize: {
@@ -200,22 +267,46 @@
             apiHost: "https://aibookrates.onrender.com",
         };
 
+        function setupScrollListener() {
+            const chatContainer = document.querySelector('.custom-chatbot').shadowRoot
+                .querySelector('.relative.h-full');
+            if (chatContainer) {
+                chatContainer.addEventListener('scroll', function() {
+                    window.parent.postMessage({
+                        type: 'chatScroll',
+                        scrollTop: this.scrollTop
+                    }, '*');
+                });
+            }
+        }
+
+        setTimeout(setupScrollListener, 1000);
+        
         function getChatContent() {
             let textContent = "建築技術規則 @ 台中建管 AI 聊天記錄\n\n";
             textContent += `輸出時間: ${new Date().toLocaleString('zh-TW')}\n\n`;
             textContent += "-------------------------------------\n\n";
+            
             const chatbotElement = document.querySelector('.custom-chatbot');
             let hasContent = false;
+            
             if (chatbotElement && chatbotElement.shadowRoot) {
                 try {
-                    const selectors = ['.border-transparent', '.flex.items-start', '.overflow-y-auto .flex'];
+                    const selectors = [
+                        '.border-transparent',
+                        '.flex.items-start',
+                        '.overflow-y-auto .flex'
+                    ];
+                    
                     let messageContainers = [];
                     for (const selector of selectors) {
                         messageContainers = chatbotElement.shadowRoot.querySelectorAll(selector);
                         if (messageContainers && messageContainers.length > 0) {
+                            console.log(`找到訊息容器，使用選擇器: ${selector}`);
                             break;
                         }
                     }
+                    
                     messageContainers.forEach((container, index) => {
                         try {
                             const msgText = container.textContent || '';
@@ -225,10 +316,15 @@
                                 textContent += "-------------------------------------\n\n";
                                 hasContent = true;
                             }
-                        } catch (e) {}
+                        } catch (e) {
+                            console.error('處理訊息時出錯：', e);
+                        }
                     });
-                } catch (e) {}
+                } catch (e) {
+                    console.error('獲取聊天內容時出錯：', e);
+                }
             }
+            
             if (!hasContent) {
                 textContent += "AI助手：\n您好！歡迎使用建築技術規則與台中建管問答系統。有什麼我可以幫您解答的問題嗎？\n\n";
                 textContent += "-------------------------------------\n\n";
@@ -236,9 +332,10 @@
                 textContent += "-------------------------------------\n\n";
                 textContent += "AI助手：\n依據台中市都市計畫法台中市施行自治條例，一般住宅區的建蔽率為60%。但具體數值可能因不同分區或特定區域規定而有所不同。\n\n";
             }
+            
             return textContent;
         }
-
+        
         function exportToTxt() {
             try {
                 const textContent = getChatContent();
@@ -251,129 +348,345 @@
                 setTimeout(() => {
                     document.body.removeChild(link);
                     URL.revokeObjectURL(link.href);
+                    console.log('TXT 檔案下載完成');
                 }, 100);
-            } catch (error) {}
+            } catch (error) {
+                console.error('下載 TXT 聊天記錄時發生錯誤：', error);
+            }
         }
-
-        // PDF-LIB + fontkit 產生純文字中文 PDF（用 Noto Sans TC）
-        async function exportToPdf() {
-            document.getElementById('loadingOverlay').style.display = 'flex';
-            try {
-                const txt = getChatContent();
-
-                // 這行指向你的本地字型
-                const fontUrl = 'texture/NotoSansCJKtc-Regular.otf';
-                const fontBytes = await fetch(fontUrl).then(res => res.arrayBuffer());
-
-                const pdfDoc = await PDFLib.PDFDocument.create();
-                pdfDoc.registerFontkit(window.fontkit);
-                let customFont = await pdfDoc.embedFont(fontBytes);
-
-
-                let page = pdfDoc.addPage([595.28, 841.89]); // A4 pt
-                const fontSize = 14;
-                const margin = 40;
-                const maxWidth = 595.28 - margin * 2;
-                let y = 841.89 - margin;
-
-                page.drawText("建築技術規則 @ 台中建管 AI 聊天記錄", {
-                    x: margin,
-                    y: y,
-                    size: fontSize + 2,
-                    font: customFont,
-                });
-                y -= fontSize * 2;
-
-                const lines = txt.split(/\r?\n/);
-                for (let line of lines) {
-                    if (y < margin + fontSize * 2) {
-                        page = pdfDoc.addPage([595.28, 841.89]);
-                        y = 841.89 - margin;
+        
+        function formatTextToHTML(text) {
+            const lines = text.split('\n');
+            let htmlContent = '';
+            let currentSpeaker = '';
+            let messageContent = '';
+            let inMessage = false;
+            
+            htmlContent += `<h1>建築技術規則 @ 台中建管 AI 聊天記錄</h1>`;
+            htmlContent += `<div class="timestamp">輸出時間: ${new Date().toLocaleString('zh-TW')}</div>`;
+            
+            for (let i = 0; i < lines; i++) {
+                const line = lines[i];
+                
+                if (line.trim() === "-------------------------------------") {
+                    if (inMessage) {
+                        htmlContent += `<div class="message-block">`;
+                        htmlContent += `<div class="speaker">${currentSpeaker}</div>`;
+                        htmlContent += `<div class="message-content">${messageContent}</div>`;
+                        htmlContent += `</div>`;
+                        htmlContent += `<div class="divider"></div>`;
+                        inMessage = false;
+                        currentSpeaker = '';
+                        messageContent = '';
+                    } else {
+                        htmlContent += `<div class="divider"></div>`;
                     }
+                    continue;
+                }
+                
+                if (line.endsWith('：')) {
+                    if (inMessage) {
+                        htmlContent += `<div class="message-block">`;
+                        htmlContent += `<div class="speaker">${currentSpeaker}</div>`;
+                        htmlContent += `<div class="message-content">${messageContent}</div>`;
+                        htmlContent += `</div>`;
+                        messageContent = '';
+                    }
+                    
+                    currentSpeaker = line;
+                    inMessage = true;
+                    continue;
+                }
+                
+                if (inMessage && line.trim() !== '') {
+                    messageContent += (messageContent ? '\n' : '') + line;
+                }
+            }
+            
+            if (inMessage && currentSpeaker) {
+                htmlContent += `<div class="message-block">`;
+                htmlContent += `<div class="speaker">${currentSpeaker}</div>`;
+                htmlContent += `<div class="message-content">${messageContent}</div>`;
+                htmlContent += `</div>`;
+            }
+            
+            htmlContent += `<div class="footer">回答僅供參考，請善盡查證義務，並遵循當地法律法規。</div>`;
+            
+            return htmlContent;
+        }
+        
+        async function exportToPdf() {
+            try {
+                document.getElementById('loadingOverlay').style.display = 'flex';
+                const textContent = getChatContent();
+                const htmlContent = formatTextToHTML(textContent);
+                const contentDiv = document.getElementById('pdf-content');
+                contentDiv.innerHTML = htmlContent;
+                contentDiv.style.display = 'block';
+                
+                await document.fonts.ready;
+                const canvas = await html2canvas(contentDiv, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    letterRendering: true,
+                    allowTaint: true,
+                });
+                
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+                
+                const imgWidth = 210;
+                const pageHeight = 297;
+                const imgHeight = canvas.height * imgWidth / canvas.width;
+                let heightLeft = imgHeight;
+                let position = 0;
+                
+                pdf.addImage(canvas, 'JPEG', 0, position, imgWidth, imgHeight, '', 'FAST');
+                heightLeft -= pageHeight;
+                
+                while (heightLeft > 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(canvas, 'JPEG', 0, position, imgWidth, imgHeight, '', 'FAST');
+                    heightLeft -= pageHeight;
+                }
+                
+                contentDiv.style.display = 'none';
+                pdf.save(`建築技術規則AI聊天記錄_${new Date().toISOString().slice(0, 10)}.pdf`);
+                document.getElementById('loadingOverlay').style.display = 'none';
+                console.log('PDF 檔案下載完成');
+            } catch (error) {
+                console.error('下載 PDF 聊天記錄時發生錯誤：', error);
+                alert('無法生成 PDF 檔案：' + error.message);
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }
+        }
+        
+        async function exportToWord() {
+            try {
+                document.getElementById('loadingOverlay').style.display = 'flex';
+
+                if (!window.docx) {
+                    throw new Error('docx library not loaded');
+                }
+
+                const textContent = getChatContent();
+                const lines = textContent.split('\n');
+                const { Document, Packer, Paragraph, TextRun } = window.docx;
+
+                // 準備 children 陣列
+                const children = [];
+                children.push(
+                    new Paragraph({
+                        children: [
+                            new TextRun({
+                                text: "建築技術規則 @ 台中建管 AI 聊天記錄",
+                                bold: true,
+                                size: 36
+                            })
+                        ]
+                    })
+                );
+                children.push(
+                    new Paragraph({
+                        children: [
+                            new TextRun({
+                                text: `輸出時間: ${new Date().toLocaleString('zh-TW')}`,
+                                size: 24,
+                                color: "666666"
+                            })
+                        ],
+                        spacing: { after: 400 }
+                    })
+                );
+
+                let currentSpeaker = '';
+                let messageContent = [];
+                let inMessage = false;
+
+                for (const line of lines) {
                     if (line.trim() === "-------------------------------------") {
-                        y -= fontSize * 0.7;
-                        page.drawText("-------------------------------------", {
-                            x: margin,
-                            y: y,
-                            size: fontSize - 1,
-                            font: customFont,
-                        });
-                        y -= fontSize;
+                        if (inMessage) {
+                            children.push(
+                                new Paragraph({
+                                    children: [
+                                        new TextRun({
+                                            text: currentSpeaker,
+                                            bold: true,
+                                            size: 28
+                                        })
+                                    ]
+                                })
+                            );
+                            messageContent.forEach(content => {
+                                children.push(
+                                    new Paragraph({
+                                        children: [
+                                            new TextRun({
+                                                text: content,
+                                                size: 28
+                                            })
+                                        ]
+                                    })
+                                );
+                            });
+                            children.push(
+                                new Paragraph({
+                                    thematicBreak: true,
+                                    spacing: { before: 200, after: 200 }
+                                })
+                            );
+                            inMessage = false;
+                            currentSpeaker = '';
+                            messageContent = [];
+                        }
                         continue;
                     }
-                    let remaining = line;
-                    while (remaining.length > 0) {
-                        let wrap = remaining.length;
-                        let textWidth = customFont.widthOfTextAtSize(remaining, fontSize);
-                        while (textWidth > maxWidth && wrap > 0) {
-                            wrap--;
-                            textWidth = customFont.widthOfTextAtSize(remaining.substring(0, wrap), fontSize);
+
+                    if (line.endsWith('：')) {
+                        if (inMessage) {
+                            children.push(
+                                new Paragraph({
+                                    children: [
+                                        new TextRun({
+                                            text: currentSpeaker,
+                                            bold: true,
+                                            size: 28
+                                        })
+                                    ]
+                                })
+                            );
+                            messageContent.forEach(content => {
+                                children.push(
+                                    new Paragraph({
+                                        children: [
+                                            new TextRun({
+                                                text: content,
+                                                size: 28
+                                            })
+                                        ]
+                                    })
+                                );
+                            });
+                            messageContent = [];
                         }
-                        let printLine = remaining.substring(0, wrap);
-                        page.drawText(printLine, {
-                            x: margin,
-                            y: y,
-                            size: fontSize,
-                            font: customFont,
-                        });
-                        remaining = remaining.substring(wrap);
-                        y -= fontSize * 1.32;
-                        if (y < margin + fontSize * 2 && remaining.length > 0) {
-                            page = pdfDoc.addPage([595.28, 841.89]);
-                            y = 841.89 - margin;
-                        }
+                        currentSpeaker = line;
+                        inMessage = true;
+                        continue;
+                    }
+
+                    if (inMessage && line.trim() !== '') {
+                        messageContent.push(line);
                     }
                 }
-                y -= fontSize * 2;
-                if (y > margin + fontSize) {
-                    page.drawText("回答僅供參考，請善盡查證義務，並遵循當地法律法規。", {
-                        x: margin,
-                        y: y,
-                        size: fontSize - 1,
-                        font: customFont,
+
+                if (inMessage && currentSpeaker) {
+                    children.push(
+                        new Paragraph({
+                            children: [
+                                new TextRun({
+                                    text: currentSpeaker,
+                                    bold: true,
+                                    size: 28
+                                })
+                            ]
+                        })
+                    );
+                    messageContent.forEach(content => {
+                        children.push(
+                            new Paragraph({
+                                children: [
+                                    new TextRun({
+                                        text: content,
+                                        size: 28
+                                    })
+                                ]
+                            })
+                        );
                     });
                 }
 
-                const pdfBytes = await pdfDoc.save();
-                const b = new Blob([pdfBytes], { type: 'application/pdf' });
-                const url = URL.createObjectURL(b);
+                children.push(
+                    new Paragraph({
+                        thematicBreak: true,
+                        spacing: { before: 200, after: 200 }
+                    }),
+                    new Paragraph({
+                        children: [
+                            new TextRun({
+                                text: "回答僅供參考，請善盡查證義務，並遵循當地法律法規。",
+                                size: 20,
+                                color: "777777"
+                            })
+                        ],
+                        alignment: "center",
+                        spacing: { before: 600 }
+                    })
+                );
+
+                const doc = new Document({
+                    sections: [
+                        {
+                            children: children
+                        }
+                    ]
+                });
+
+                const blob = await Packer.toBlob(doc);
                 const link = document.createElement('a');
-                link.href = url;
-                link.download = `建築技術規則AI聊天記錄_${new Date().toISOString().slice(0, 10)}.pdf`;
+                link.href = URL.createObjectURL(blob);
+                link.download = `建築技術規則AI聊天記錄_${new Date().toISOString().slice(0, 10)}.docx`;
                 document.body.appendChild(link);
                 link.click();
                 setTimeout(() => {
                     document.body.removeChild(link);
-                    URL.revokeObjectURL(url);
-                }, 200);
-            } catch (e) {
-                alert('PDF 產生失敗：' + e.message);
-            } finally {
+                    URL.revokeObjectURL(link.href);
+                    console.log('Word 檔案下載完成');
+                }, 100);
+
+                document.getElementById('loadingOverlay').style.display = 'none';
+            } catch (error) {
+                console.error('下載 Word 聊天記錄時發生錯誤：', error);
+                alert('無法生成 Word 檔案：' + error.message);
                 document.getElementById('loadingOverlay').style.display = 'none';
             }
         }
-
+        
         document.addEventListener('DOMContentLoaded', function() {
             const saveButton = document.getElementById('saveButton');
             const exportDialog = document.getElementById('exportDialog');
             const saveTxtButton = document.getElementById('saveTxtButton');
             const savePdfButton = document.getElementById('savePdfButton');
-
+            const saveWordButton = document.getElementById('saveWordButton');
+            
             saveButton.addEventListener('click', function(e) {
                 e.stopPropagation();
                 exportDialog.style.display = exportDialog.style.display === 'block' ? 'none' : 'block';
             });
+            
             document.addEventListener('click', function(e) {
-                if (e.target !== saveButton && e.target !== exportDialog && !exportDialog.contains(e.target)) {
+                if (!saveButton.contains(e.target) && !exportDialog.contains(e.target)) {
                     exportDialog.style.display = 'none';
                 }
             });
+            
             saveTxtButton.addEventListener('click', function() {
                 exportToTxt();
                 exportDialog.style.display = 'none';
             });
+            
             savePdfButton.addEventListener('click', function() {
                 exportToPdf();
+                exportDialog.style.display = 'none';
+            });
+            
+            saveWordButton.addEventListener('click', function() {
+                exportToWord();
                 exportDialog.style.display = 'none';
             });
         });
@@ -381,10 +694,11 @@
 
     <script type="module">
         import Chatbot from "https://cdn.jsdelivr.net/npm/flowise-embed/dist/web.js"
+        
         Chatbot.initFull({
             chatflowid: CHATBOT_CONFIG.chatflowId,
             apiHost: CHATBOT_CONFIG.apiHost,
-            theme: {
+            theme: {                            
                 chatWindow: {
                     showTitle: true,
                     backgroundColor: 'transparent',
@@ -395,13 +709,13 @@
                         backgroundColor: CHATBOT_CONFIG.colors.botBubble,
                         textColor: CHATBOT_CONFIG.colors.botText,
                         showAvatar: CHATBOT_CONFIG.avatars.showBotAvatar,
-                        avatarSrc: CHATBOT_CONFIG.avatars.bot,
+                        avatarSrc: CHATBOT_CONFIG.avatars.bot
                     },
                     userMessage: {
                         backgroundColor: CHATBOT_CONFIG.colors.userBubble,
                         textColor: CHATBOT_CONFIG.colors.userText,
                         showAvatar: CHATBOT_CONFIG.avatars.showUserAvatar,
-                        avatarSrc: CHATBOT_CONFIG.avatars.user,
+                        avatarSrc: CHATBOT_CONFIG.avatars.user
                     },
                     titleBackgroundColor: 'transparent',
                     titleTextColor: '#000000',
