@@ -548,7 +548,8 @@
                 const lines = textContent.split('\n');
                 let renderedLines = [];
                 let isUserBlock = false;
-                for (let line of lines) {
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i];
                     if (line.trim() === '用戶：') {
                         renderedLines.push({text: line, isUser: true});
                         isUserBlock = true;
@@ -562,6 +563,7 @@
                         renderedLines.push({text: '', isUser: isUserBlock});
                         continue;
                     }
+                    // 將每一行內容用 wrapText 分割，並標記正確 isUserBlock
                     const wrapped = wrapText(ctx, line, maxTextWidth);
                     for (let w of wrapped) {
                         renderedLines.push({text: w, isUser: isUserBlock});
