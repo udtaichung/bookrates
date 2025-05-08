@@ -359,6 +359,43 @@
             return textContent;
         }
         
+        function wrapText(ctx, text, maxWidth) {
+            let lines = [];
+            let line = '';
+            for (let i = 0; i < text.length; i++) {
+                line += text[i];
+                // 若超過寬度，強制斷行
+                if (ctx.measureText(line).width > maxWidth) {
+                    if (line.length === 1) {
+                        lines.push(line);
+                        line = '';
+                    } else {
+                        // 進一步細分，確保每一行都不超過 maxWidth
+                        let safeLine = line.slice(0, -1);
+                        let lastChar = line.slice(-1);
+                        // 若 safeLine 仍超過 maxWidth，則遞迴切割
+                        while (ctx.measureText(safeLine).width > maxWidth && safeLine.length > 1) {
+                            lines.push(safeLine.slice(0, 1));
+                            safeLine = safeLine.slice(1);
+                        }
+                        if (safeLine) lines.push(safeLine);
+                        line = lastChar;
+                    }
+                }
+            }
+            if (line) lines.push(line);
+            // 最後再次檢查每一行
+            let finalLines = [];
+            for (let l of lines) {
+                while (ctx.measureText(l).width > maxWidth && l.length > 1) {
+                    finalLines.push(l.slice(0, 1));
+                    l = l.slice(1);
+                }
+                if (l) finalLines.push(l);
+            }
+            return finalLines;
+        }
+        
         function exportToTxt() {
             try {
                 const textContent = getChatContent();
@@ -437,7 +474,6 @@
                     htmlContent += `<div class="speaker">${currentSpeaker}</div>`;
                 }
                 htmlContent += `<div class="message-content">${messageContent}</div>`;
-                htmlContent += `</div>`;
             }
             
             htmlContent += `<div class="footer">回答僅供參考，請善盡查證義務，並遵循當地法律法規。</div>`;
@@ -477,18 +513,36 @@
                     let line = '';
                     for (let i = 0; i < text.length; i++) {
                         line += text[i];
+                        // 若超過寬度，強制斷行
                         if (ctx.measureText(line).width > maxWidth) {
                             if (line.length === 1) {
                                 lines.push(line);
                                 line = '';
                             } else {
-                                lines.push(line.slice(0, -1));
-                                line = line.slice(-1);
+                                // 進一步細分，確保每一行都不超過 maxWidth
+                                let safeLine = line.slice(0, -1);
+                                let lastChar = line.slice(-1);
+                                // 若 safeLine 仍超過 maxWidth，則遞迴切割
+                                while (ctx.measureText(safeLine).width > maxWidth && safeLine.length > 1) {
+                                    lines.push(safeLine.slice(0, 1));
+                                    safeLine = safeLine.slice(1);
+                                }
+                                if (safeLine) lines.push(safeLine);
+                                line = lastChar;
                             }
                         }
                     }
                     if (line) lines.push(line);
-                    return lines;
+                    // 最後再次檢查每一行
+                    let finalLines = [];
+                    for (let l of lines) {
+                        while (ctx.measureText(l).width > maxWidth && l.length > 1) {
+                            finalLines.push(l.slice(0, 1));
+                            l = l.slice(1);
+                        }
+                        if (l) finalLines.push(l);
+                    }
+                    return finalLines;
                 }
                 // 分割內容
                 const lines = textContent.split('\n');
