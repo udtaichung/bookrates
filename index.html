@@ -344,7 +344,7 @@
             },
             {
                 title: "刷新聊天記錄",
-                description: "點擊此按鈕可以清空當前對話，開始新的對話。",
+                description: "點擊此按鈕可以清空當前對話，開始新的對話。這是 Flowise 內建的功能。",
                 target: "header", // 使用 header 作為基準
                 selector: ".chain-selector", // 基於 LLM 選擇器
                 position: "relative", // 特殊標記：相對定位
@@ -678,9 +678,10 @@
             }
         });
         
-        // 開發者工具：按 Ctrl+Shift+T 重置教學
+        // 開發者工具：按 Ctrl+Alt+R 重置教學
         document.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+            if (e.ctrlKey && e.altKey && e.key === 'r') {
+                e.preventDefault(); // 防止瀏覽器預設行為
                 resetTutorial();
             }
         });
