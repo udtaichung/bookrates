@@ -253,6 +253,16 @@
                 font-size: 14px;
                 padding: 8px 15px;
             }
+            
+            /* 手機版提示框位置調整 */
+            .tutorial-tooltip-mobile-adjust {
+                left: 20px !important;
+                right: 20px !important;
+                width: calc(100% - 40px) !important;
+                max-width: none !important;
+                min-width: none !important;
+                transform: none !important;
+            }
         }
     </style>
 </head>
@@ -445,16 +455,28 @@
                             bottom: frameRect.top + elementRect.bottom
                         };
                         
+                        // 檢查是否為手機版
+                        const isMobile = window.innerWidth <= 768;
+                        
                         // 特殊處理：相對定位（針對刷新按鈕）
                         if (step.position === 'relative') {
                             // 基於選擇器位置，加上偏移量
+                            let spotlightOffsetX = (step.offsetX || 0) - 30; // 小框往左30px
+                            let spotlightOffsetY = (step.offsetY || 0);
+                            
+                            // 手機版調整：小框位置
+                            if (isMobile) {
+                                spotlightOffsetX -= 20; // 再往左20px
+                                spotlightOffsetY -= 30; // 往上30px
+                            }
+                            
                             let spotlightRect = {
-                                top: absoluteRect.bottom + (step.offsetY || 0),
-                                left: absoluteRect.right + (step.offsetX || 0) - 30, // 小框往左30px
+                                top: absoluteRect.bottom + spotlightOffsetY,
+                                left: absoluteRect.right + spotlightOffsetX,
                                 width: 40, // 假設按鈕大小
                                 height: 40,
-                                right: absoluteRect.right + (step.offsetX || 0) - 30 + 40,
-                                bottom: absoluteRect.bottom + (step.offsetY || 0) + 40
+                                right: absoluteRect.right + spotlightOffsetX + 40,
+                                bottom: absoluteRect.bottom + spotlightOffsetY + 40
                             };
                             
                             // 設定高亮框位置（小框）
@@ -509,7 +531,8 @@
             
             let top, left, transform = '';
             
-            // 移除步驟3的特殊處理，因為已經在 positionElements 中處理了
+            // 檢查是否為手機版
+            const isMobile = window.innerWidth <= 768;
             
             // 特殊處理步驟4：下載按鈕位置調整
             if (currentStep === 3) { // 步驟4（index為3）
@@ -550,14 +573,28 @@
                     break;
             }
             
-            // 確保提示框不會超出螢幕邊界
-            const maxWidth = window.innerWidth - tooltipWidth - padding;
-            const maxHeight = window.innerHeight - tooltipHeight - padding;
+            // 手機版調整：步驟1、2的提示框防止被遮住
+            if (isMobile && (currentStep === 0 || currentStep === 1)) {
+                // 強制靠左對齊，留出安全邊距
+                left = 20;
+                transform = 'none';
+                
+                // 添加手機版樣式類
+                tooltip.classList.add('tutorial-tooltip-mobile-adjust');
+            } else {
+                tooltip.classList.remove('tutorial-tooltip-mobile-adjust');
+            }
             
-            if (left < padding) left = padding;
-            if (left > maxWidth) left = maxWidth;
-            if (top < padding) top = padding;
-            if (top > maxHeight) top = maxHeight;
+            // 確保提示框不會超出螢幕邊界（桌面版）
+            if (!isMobile || (currentStep !== 0 && currentStep !== 1)) {
+                const maxWidth = window.innerWidth - tooltipWidth - padding;
+                const maxHeight = window.innerHeight - tooltipHeight - padding;
+                
+                if (left < padding) left = padding;
+                if (left > maxWidth) left = maxWidth;
+                if (top < padding) top = padding;
+                if (top > maxHeight) top = maxHeight;
+            }
             
             tooltip.style.top = top + 'px';
             tooltip.style.left = left + 'px';
